@@ -1,0 +1,285 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+% -----------------------------------------------------
+% bvraghav-tiet-ucs503p-article.sty
+% -----------------------------------------------------
+
+% Variable: Lab Instructor
+\makeatletter \newcommand{\BvrSetLabInstructor}[1]{%
+\gdef\Bvr@LabInstructor{#1}}
+% default
+\newcommand{\Bvr@LabInstructor}{Dr. Paramveer Kaur}
+% public accessor
+\newcommand{\BvrLabInstructorValue}{\Bvr@LabInstructor}
+\makeatother
+
+% Add subtitle
+\usepackage{titling}
+% -- Set title bold
+\pretitle{\begin{center}\bfseries\fontsize{18bp}{18bp}\selectfont}
+\makeatletter
+\newcommand{\BvrSubtitle}[1]{%
+\posttitle{%
+\par\end{center}
+\begin{center}\large#1\end{center}
+\vskip 0.5em}%
+}
+\makeatother
+
+% Hints in the section title(s)
+\newcommand{\BvrHint}[1]{%
+{\normalfont\normalsize\itshape\hfill #1}}
+
+% -----------------------------------------------------
+
+\title{ArogyaMitra: An AI-Assisted Real-Time \ Telemedicine Consultation Platform}
+
+\BvrSetLabInstructor{Dr. Paramveer Kaur}
+
+\BvrSubtitle{%
+Project Proposal for UCS503P  \\
+Submitted to: \BvrLabInstructorValue \\ \bfseries
+Thapar Institute of Engineering and Technology%
+}
+
+\author{
+Animesh Sudhanshu -
+{ \texttt{1024170375}}
+\and
+Ashish Bhagat -
+{\texttt{1024170372}}
+\and
+Devansh Rathaur - 
+{\texttt{1024170380}}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Higher-order goal%
+\BvrHint{\ldots secondary framing}}
+This project aims to improve access to primary
+healthcare by reducing the friction between a patient
+needing medical advice and a doctor available to give
+it. While the broader motivation is healthcare equity
+India's government telemedicine platform), the
+immediate engineering objective is to translate
+\emph{low-friction, real-time doctor-patient
+consultation} into a measurable, deployable software
+solution built and iterated on by a small student team.
+
+\section{Time-to-value %
+\BvrHint{\ldots primary heuristic}}
+\begin{itemize}[leftmargin=0.7cm]
+\item We will deliver meaningful increments quickly by cloning and adapting an existing open-source reference implementation, then prototyping the core consultation workflow and validating it within a short iteration window.
+\item We will prioritize fast feedback over perfection by using weekly iterations (and targeting CI-backed automation early) to reduce release friction.
+\item Success is defined by what can be delivered and measured in the first iteration (a working doctor--patient consultation loop), then improved based on user feedback.
+\end{itemize}
+
+\section{Problem Statement}
+Patients, particularly those in smaller towns with
+limited specialist availability, face delays and
+friction when seeking timely medical advice for
+non-emergency conditions. Common pain points include:
+\begin{itemize}[leftmargin=0.7cm]
+\item \textbf{Access friction:} booking an in-person consultation requires travel and waiting, even for simple queries.
+\item \textbf{Fragmented communication:} follow-up questions, prescriptions, and advice are often exchanged informally (calls, messaging apps) with no persistent record.
+\item \textbf{No triage before consultation:} patients cannot easily get a first-pass sense of urgency or relevant information before a doctor is available.
+\item \textbf{Scheduling opacity:} patients cannot easily see doctor availability or track the status of a booked consultation.
+\end{itemize}
+
+\textbf{Why this matters now (contextual relevance):}
+Real-time web technologies (WebRTC, WebSockets) and
+affordable managed backends have matured enough that a
+small team can build a credible consultation platform
+in an academic timeframe, while conversational AI can
+plausibly assist (not replace) the pre-consultation
+triage step.
+
+\section{Proposed Solution %
+\BvrHint{\ldots Software Proposition}}
+\subsection{Overview}
+Build a web-based ``ArogyaMitra'' real-time
+telemedicine platform
+\begin{itemize}[leftmargin=0.7cm]
+\item \textbf{Patient portal:} registration, profile management, doctor discovery, and appointment booking.
+\item \textbf{Doctor dashboard:} availability management, appointment queue, and consultation history.
+\item \textbf{Real-time consultation:} secure real-time chat and video call between doctor and patient.
+\item \textbf{AI pre-consultation assistant:} a conversation-aware assistant that helps patients describe symptoms and prepare context before a doctor joins, with a safety layer that always defers emergency-flagged symptoms to immediate care.
+\item \textbf{Notifications:} real-time alerts when a consultation is about to begin or a doctor becomes available.
+\end{itemize}
+
+\subsection{Core workflow}
+\begin{enumerate}[leftmargin=0.7cm]
+\item Patient registers/logs in and books a consultation slot with an available doctor.
+\item Patient optionally interacts with the AI assistant to summarize symptoms ahead of time.
+\item Both parties receive a real-time notification when the consultation is about to start.
+\item Doctor and patient connect via real-time chat / video call; doctor records notes and advice.
+\item Patient can review consultation history and past notes from their profile.
+\end{enumerate}
+
+\subsection{Operational constraints for an educational setting}
+\begin{itemize}[leftmargin=0.7cm]
+\item Keep the solution usable on low-to-mid range devices via responsive web design.
+\item Avoid dependence on novel research algorithms; focus on workflow correctness, real-time reliability, and safe AI-assistance boundaries.
+\item Design for deployability using free-tier or low-cost managed hosting suitable for a pilot (e.g., Render, Netlify, MongoDB Atlas).
+\end{itemize}
+
+\section{Solution Approach %
+\BvrHint{\ldots Engineering focus}}
+This is an engineering course project, so we focus on
+integration, workflow correctness, and safe deployment
+of existing well-understood technologies rather than
+novel algorithm research.
+
+\subsection{AI assistant scope %
+\BvrHint{\ldots non-research}}
+The AI pre-consultation assistant is an integration
+task, not a research contribution:
+\begin{itemize}[leftmargin=0.7cm]
+\item Use an existing LLM API (e.g., Gemini) for conversational symptom intake; no in-house model training.
+\item Add a lightweight safety/triage layer that detects emergency-flagged keywords (e.g., chest pain, stroke signs, self-harm) and always routes to an ``seek immediate care'' response rather than open-ended advice.
+\item The assistant only prepares context for the doctor; it never issues a diagnosis or prescription.
+\end{itemize}
+
+\subsection{Web architecture %
+\BvrHint{\ldots web-based solution}}
+A typical decoupled web architecture, matching the
+reference repository:
+\begin{itemize}[leftmargin=0.7cm]
+\item \textbf{Frontend:} Next.js with a component library (Shadcn) for patient/doctor portals and the consultation UI.
+\item \textbf{Backend API:} Node.js/Express for authentication, appointment logic, and consultation record management.
+\item \textbf{Database:} MongoDB Atlas for users, appointments, consultation notes, and message history.
+\item \textbf{Real-time layer:} Socket.io for chat/notifications; WebRTC for video calls.
+\item \textbf{Authentication:} Firebase Authentication for patient and doctor accounts.
+\end{itemize}
+
+\subsection{CI/CD and fast delivery enabler}
+CI/CD will be used to:
+\begin{itemize}[leftmargin=0.7cm]
+\item Automatically build and run tests (lint, unit) on every change via GitHub Actions.
+\item Produce repeatable deployment artifacts to a staging environment (Render for backend, Netlify for frontend).
+\item Enable safe and frequent releases of incremental features.
+\end{itemize}
+
+\section{Evaluation Criterion %
+\BvrHint{\ldots measurable and attributable}}
+We define success using measurable metrics tied to the
+core consultation workflow.
+
+\subsection{Primary evaluation metric}
+\textbf{Time-to-connect (TTC):} time between a
+scheduled consultation's start time and the moment both
+doctor and patient are connected in the same
+chat/video session.
+\begin{itemize}[leftmargin=0.7cm]
+\item Target: median TTC $\le$ 2 minutes during pilot testing.
+\item Attribution: measured from server-side timestamps (scheduled time vs. session-join event).
+\end{itemize}
+
+\subsection{Secondary evaluation metrics}
+\begin{itemize}[leftmargin=0.7cm]
+\item \textbf{Booking completion rate:} percentage of started bookings that result in a confirmed appointment.
+\item \textbf{AI assistant safety accuracy:} percentage of emergency-flagged test cases correctly routed to ``seek immediate care'' during a fixed test suite run.
+\item \textbf{User clarity:} patient-reported clarity of the consultation flow using a simple 1--5 feedback question.
+\item \textbf{Reliability:} availability of staging/production for login, booking, and consultation during test windows (e.g., $\ge$ 99% uptime in pilot).
+\end{itemize}
+
+\subsection{Pilot validation plan %
+\BvrHint{\ldots high-level}}
+\begin{itemize}[leftmargin=0.7cm]
+\item Recruit 10--15 pilot patients and 3--5 volunteer/simulated doctor accounts.
+\item Run a fixed AI-assistant test suite (symptom prompts including emergency cases) before each release to catch safety regressions.
+\item Compare TTC and booking completion rate across iterations.
+\end{itemize}
+
+\section{Scalability %
+\BvrHint{\ldots with foresight}}
+The proposition should scale in both theoretical and
+practical senses.
+
+\begin{enumerate}[leftmargin=0.7cm]
+\item \textbf{Scalable (theoretically):} The system should support growth in number of concurrent consultations and users by:
+\begin{itemize}[leftmargin=0.7cm]
+\item decoupling frontend and backend (already true of the Next.js/Express split),
+\item using stateless REST endpoints with Socket.io namespaces scoped per consultation room,
+\item indexing appointment and user queries in MongoDB.
+\end{itemize}
+
+\item \textbf{Operationally deployable (practically):} The system should run on common managed hosting:  
+\begin{itemize}[leftmargin=0.7cm]  
+    \item MongoDB Atlas as a managed database,  
+    \item Render/Netlify as platform-hosted deployment targets,  
+    \item CI/CD pipeline for staging/production via GitHub Actions.  
+\end{itemize}
+
+\end{enumerate}
+
+\section{Engine availability heuristic}
+A mature set of ``engines'' (tooling/services) is
+already available and proven in the reference
+repository, so the team focuses on workflow and safety
+correctness rather than infrastructure:
+\begin{itemize}[leftmargin=0.7cm]
+\item Next.js for the frontend framework.
+\item Node.js/Express for REST API backend.
+\item MongoDB Atlas as the managed document database.
+\item Firebase Authentication for identity.
+\item Socket.io for real-time chat/notifications; WebRTC for video.
+\item Gemini API / Vercel AI SDK for the conversational assistant.
+\item GitHub Actions as the CI runner; Render/Netlify as deployment targets.
+\end{itemize}
+
+\section{Project scope and deliverables %
+\BvrHint{\ldots iteration-friendly}}
+\subsection{Initial deliverable %
+\BvrHint{\ldots first iteration}}
+\begin{itemize}[leftmargin=0.7cm]
+\item Fork/clone the reference repository and set up local + staging environments.
+\item Patient and doctor authentication and profile pages.
+\item Appointment booking flow with doctor availability.
+\item Real-time chat consultation between doctor and patient.
+\item Basic logging and timestamps for TTC measurement.
+\item CI: build + lint + backend unit tests.
+\item CD to staging (Render + Netlify) with a single pipeline job.
+\end{itemize}
+
+\subsection{Subsequent deliverables}
+\begin{itemize}[leftmargin=0.7cm]
+\item Real-time video call integration (WebRTC) alongside chat.
+\item AI pre-consultation assistant with the emergency-triage safety layer.
+\item Real-time notifications for upcoming/available consultations.
+\item Admin/analytics view of bookings, TTC, and completion rate.
+\item Regression test suite for AI assistant safety behaviour.
+\end{itemize}
+
+\section{Risks and mitigations}
+\begin{itemize}[leftmargin=0.7cm]
+\item \textbf{Data privacy / consent:} minimize collected medical data; store only what is required for the consultation record; never persist raw AI assistant conversations beyond what is needed for the doctor's context.
+\item \textbf{AI safety failure:} maintain a small, fixed regression test suite of emergency-symptom prompts that must pass before every release; the assistant never issues a diagnosis or prescription.
+\item \textbf{Real-time reliability:} use WebRTC/Socket.io connection-state handling and fallbacks (e.g., reconnect logic) so a dropped session does not lose consultation context.
+\item \textbf{Staff/doctor adoption:} keep the doctor dashboard minimal (availability toggle, queue, notes) to reduce onboarding friction for simulated/volunteer doctors during the pilot.
+\item \textbf{Operational issues in pilot:} use staging early; ensure CI/CD produces repeatable deployments before the pilot window.
+\end{itemize}
+\section{Summary}
+This project proposes a deployable, AI-assisted
+real-time telemedicine platform, to
+reduce the friction between patients and doctors for
+non-emergency consultations. It meets the course
+criteria by emphasizing time-to-value through rapid
+iterations on a proven codebase, implementing CI/CD to
+support frequent safe releases, and using measurable
+evaluation criteria (especially time-to-connect and AI
+assistant safety accuracy). It remains focused on
+engineering integration, workflow correctness, and safe
+AI-assistance boundaries rather than research-driven
+novelty.
+
+\end{document}
