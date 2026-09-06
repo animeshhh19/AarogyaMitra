@@ -5,11 +5,17 @@
 ### Project Details
 
 | **Course** | UCS503 / UCS503P — Software Engineering |
+
 | **Institute** | Thapar Institute of Engineering and Technology, Patiala |
+
 | **Project** | Telemedicine Platform |
+
 | **Member** | Devansh Rathaur 1024170380 |
+
 | **Team Members** | Ashish Bhagat 1024170372, Devansh Rathaur 1024170380, Animesh Sudhanshu 1024170375 |
+
 | **Project Stage** | Project Proposal |
+
 | **Week** | Week 1 |
 
 ### Objective for the Week
