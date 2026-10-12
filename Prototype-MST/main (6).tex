@@ -1,0 +1,759 @@
+\documentclass{tietreport}
+
+\setlength{\headheight}{14.5pt} % fixes fancyhdr warning with 12pt font
+
+\emergencystretch=2em
+
+% Import images
+\usepackage{graphicx}
+
+% Extra packages used for tables and rotated (landscape) diagrams
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{rotating}
+\usepackage{float}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt}
+\makeatletter\@openrightfalse\makeatother % no blank pages before chapters
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.7}
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+
+% Bibliography configuration
+\usepackage[
+  date=year,
+  style=alphabetic,
+  backend=biber,
+  sorting=nty,
+  maxnames=5,
+  minnames=3,
+  maxalphanames=4,
+  minalphanames=3,
+  backref=true,
+  doi=false,
+  isbn=false,
+  url=false,
+  eprint=false
+]{biblatex}
+\addbibresource{references.bib}
+
+%% Helpers ------------------------------------------------------------
+% Wide diagram on its own rotated page: file, caption, label
+\newcommand{\widefig}[3]{%
+  \begin{figure}[!htbp]
+    \centering
+    \makebox[\textwidth][c]{\includegraphics[width=1.12\textwidth]{figures/#1}}
+    \caption{#2}\label{#3}
+  \end{figure}}
+% Square diagram in the normal text flow: file, caption, label
+\newcommand{\squarefig}[3]{%
+  \begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.58\textwidth]{figures/#1}
+    \caption{#2}\label{#3}
+  \end{figure}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+%% ==================================================
+%% CUSTOMIZE THESE FIELDS FOR YOUR PROJECT
+%% ==================================================
+
+% Course/Lab header
+\TitlePageHeader{%
+  UCS503P - Software Engineering%
+}
+
+% Main project title
+\ProjectTitle{%
+  ArogyaMitra%
+}
+
+% Subtitle or project description
+\ProjectSubTitle{%
+  An AI-Assisted Real-Time Telemedicine Consultation Platform%
+}
+
+% Student information (up to 4 students)
+\author{%
+  \texttt{1024170375} Animesh Sudhanshu \\
+  \texttt{1024170372} Ashish Bhagat \\
+  \texttt{1024170380} Devansh Rathaur%
+}
+
+% Group number, degree, year, program
+\TitlePageSubText{%
+  Group: \texttt{3Q34} BE Third Year, CSE%
+}
+
+% Faculty advisor/guide name
+\AdvisorName{%
+  Dr. Paramveer Kaur%
+}
+
+% Evaluation period and department info
+\TitlePageFooterText{{%
+    \large Mid-Semester Evaluation \\[0.2cm]
+    \bfseries Computer Science and Engineering
+    Department%
+  } \\[0.15cm]
+  Thapar Institute of Engineering and Technology,
+  Patiala%
+}
+
+%% ==================================================
+
+\begin{document}
+
+% Generate title page
+\maketitle
+
+% Table of contents (auto-generated from chapters)
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+% ===== CHAPTER 1: INTRODUCTION =====
+
+\chapter{Introduction}
+
+\section{Background and Context}
+
+ArogyaMitra is a web-based, AI-assisted real-time telemedicine
+platform. It reduces the friction between a patient who needs
+medical advice and a doctor who can give it, for non-emergency
+consultations, using chat, online booking and an AI
+assistant that prepares context before the doctor joins.
+
+The broader motivation for the project is improving access to
+primary healthcare and healthcare equity. The immediate engineering
+objective is to translate low-friction, real-time doctor--patient
+consultation into a measurable, deployable software solution built
+and iterated on by a small student team. Real-time web
+technologies and affordable managed backends have matured enough that a
+small team can build a credible consultation platform in an academic
+timeframe, while conversational AI can plausibly assist (not
+replace) the pre-consultation triage step.
+
+This is an engineering course project, so the focus is on
+integration, workflow correctness and safe deployment of existing,
+well-understood technologies rather than on novel algorithm
+research. Time-to-value is the primary heuristic: meaningful
+increments are delivered quickly by adapting an existing open-source
+reference implementation, prototyping the core consultation workflow
+and validating it within weekly iterations, with CI-backed
+automation introduced early to reduce release friction.
+
+\subsection{Problem Statement}
+
+Patients, particularly those in smaller towns with limited
+specialist availability, face delays and information loss when
+seeking timely medical advice for non-emergency conditions. The
+existing challenges are:
+
+\begin{itemize}
+  \item \textbf{Access friction:} Booking an in-person visit means
+    travel and waiting, even for simple, non-emergency queries.
+  \item \textbf{Fragmented communication:} Follow-ups, advice and
+    prescriptions are exchanged informally (calls, chat apps) with
+    no persistent record.
+  \item \textbf{No triage before consultation:} Patients cannot
+    get a first-pass sense of urgency or prepare context before a
+    doctor is available.
+  \item \textbf{Scheduling opacity:} Patients cannot easily see
+    doctor availability or track the status of a booked
+    consultation.
+\end{itemize}
+
+\section{Project Objectives}
+
+ArogyaMitra streamlines the consultation journey end to end through
+the following objectives:
+
+\begin{enumerate}
+  \item \textbf{Patient portal and doctor dashboard:}
+    Registration, profiles, doctor discovery, booking, consultation
+    queue and history.
+  \item \textbf{Real-time chat consultation:} A secure chat room
+    per consultation, joinable only in the booked time window.
+  \item \textbf{AI pre-consultation assistant:} Gemini-based symptom
+    intake with an emergency-triage safety layer; the assistant
+    never diagnoses or prescribes.
+  \item \textbf{Records and admin control:} Medical records and
+    admin approval of doctors.
+\end{enumerate}
+
+\noindent\textbf{Current status.} The frontend and backend currently
+run locally on the development machine (localhost) and have not yet
+been deployed to Netlify and Render. Online payments (Stripe) and
+video conferencing are not part of the current implementation and
+will be implemented in the future.
+
+The \textbf{primary success metric} is a median time-to-connect
+(TTC) of at most 2 minutes between the scheduled start and both
+parties being in the same session.
+
+\section{Feasibility Study}
+
+Table~\ref{tab:feasibility} answers the six feasibility questions
+for the proposed platform.
+
+\begin{table}[!htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}p{1.35in}Y@{}}
+  \toprule
+  \textbf{No.} & \textbf{Question} & \textbf{Answer} \\
+  \midrule
+  1 & What if the system wasn't implemented? &
+    Patients keep travelling and waiting for simple queries.
+    Advice stays scattered over calls and chat apps with no
+    record. \\
+  2 & What are the current process problems? &
+    No instant view of doctor availability or booking status.
+    No triage or context before the consultation starts. \\
+  3 & How will the proposed system help? &
+    Remote booking, chat, persistent history and records.
+    AI prepares symptoms for the doctor; emergencies are
+    escalated. \\
+  4 & What will be the integration problems? &
+    Join control by booked hour. Clerk-JWT secured API; keeping AI
+    vectors in sync via hooks. \\
+    hooks. \\
+  5 & Is new technology needed? Which skills? &
+    No new hardware: Next.js, Node/Express, MongoDB. Skills:
+    full-stack JavaScript, REST, prompt/tool design. \\
+  6 & What facilities must be supported? &
+    Managed hosting (Netlify, Render, planned; currently
+    localhost) and MongoDB Atlas. SaaS: Clerk and Gemini; a
+    browser. \\
+  \bottomrule
+\end{tabularx}
+\caption{Feasibility study of the ArogyaMitra platform}
+\label{tab:feasibility}
+\end{table}
+
+\noindent\textbf{Feasibility verdict:} Highly viable. The platform
+uses a standard managed stack, is built on a proven open-source
+codebase, and has minimal infrastructure demands.
+
+\section{Scope and Deliverables}
+
+\subsection{Initial Deliverable (First Iteration)}
+
+\begin{itemize}
+  \item Fork/clone the reference repository and set up the local
+    environment (done; the staging environment is planned).
+  \item Patient and doctor authentication and profile pages.
+  \item Appointment booking flow with doctor availability.
+  \item Real-time chat consultation between doctor and patient.
+  \item Basic logging and timestamps for TTC measurement.
+  \item CI: build, lint and backend unit tests.
+  \item CD to staging (Render and Netlify) with a single pipeline
+    job (planned; the application currently runs on localhost).
+\end{itemize}
+
+\subsection{Subsequent Deliverables}
+
+\begin{itemize}
+  \item Online payments (Stripe) and real-time video consultation
+    (LiveKit): to be implemented in the future.
+  \item Deployment of the frontend (Netlify) and backend (Render)
+    from the current local setup.
+  \item AI pre-consultation assistant with the emergency-triage
+    safety layer.
+  \item In-app alerts for upcoming consultations.
+  \item Admin/analytics view of bookings, TTC and completion rate.
+  \item Regression test suite for AI assistant safety behaviour.
+\end{itemize}
+
+% ===== CHAPTER 2: METHODOLOGY & DESIGN =====
+
+\chapter{Methodology and Design}
+
+\section{Requirements Engineering}
+
+\subsection{Requirements Engineering Process}
+
+The requirements were developed through the seven standard
+requirements-engineering activities: (1)~inception,
+(2)~elicitation, (3)~elaboration, (4)~negotiation,
+(5)~specification, (6)~validation and (7)~management.
+
+\subsection{Stakeholders}
+
+\begin{itemize}
+  \item \textbf{Primary actors:} Patient and Doctor (end users).
+  \item \textbf{Secondary actor:} Administrator (approval and
+    account management).
+  \item \textbf{External systems:} Clerk and Gemini; Stripe and
+    LiveKit will be added in the future.
+\end{itemize}
+
+\subsection{Functional Requirements}
+
+\begin{table}[!htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}p{1.45in}Y@{}}
+  \toprule
+  \textbf{ID} & \textbf{Requirement} & \textbf{Description} \\
+  \midrule
+  FR1 & User authentication and roles &
+    Clerk sign-in with JWT sessions; patient, doctor and admin
+    roles. \\
+  FR2 & Doctor onboarding and approval &
+    Doctors publish specialty, price and schedule; the admin
+    approves or rejects. \\
+  FR3 & Discovery and booking &
+    Patients search doctors and book a date and time slot. \\
+  FR4 & Payments &
+    Online payments for paid doctors (Stripe Checkout) will be
+    implemented in the future. \\
+  FR5 & Real-time consultation &
+    Text chat in a per-consultation room, joinable only in the
+    booked hour; video calls to be added in the future. \\
+  FR6 & Consultation lifecycle &
+    pending $\rightarrow$ in-progress $\rightarrow$ completed /
+    canceled; hourly auto-close. \\
+  FR7 & AI pre-consultation assistant &
+    Symptom triage tools, emergency override, RAG over the
+    patient's own records, PDF upload, hourly quota. \\
+  FR8 & Records and alerts &
+    Consultation history, medical records and in-app consultation
+    alerts. \\
+  \bottomrule
+\end{tabularx}
+\caption{Functional requirements}
+\label{tab:fr}
+\end{table}
+
+\subsection{Non-Functional Requirements}
+
+\begin{table}[!htbp]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}p{1.2in}Y@{}}
+  \toprule
+  \textbf{ID} & \textbf{Category} & \textbf{Requirement} \\
+  \midrule
+  NFR1 & Performance &
+    Median time-to-connect $\leq$ 2 min; streamed AI replies. \\
+  NFR2 & Security &
+    Clerk JWT, role checks, participant check, helmet, input
+    sanitising, rate limiting. \\
+  NFR3 & Usability &
+    Responsive web UI for desktop, tablet and low-to-mid range
+    phones. \\
+  NFR4 & Reliability &
+    AI context search degrades gracefully. \\
+  NFR5 & Privacy and safety &
+    Per-patient vector scope; the AI never diagnoses or
+    prescribes. \\
+  \bottomrule
+\end{tabularx}
+\caption{Non-functional requirements}
+\label{tab:nfr}
+\end{table}
+
+\section{System Architecture}
+
+\subsection{High-Level Design}
+
+ArogyaMitra follows a decoupled three-tier web architecture with
+external SaaS services (Figure~\ref{fig:architecture}). The client
+tier is a responsive web interface (desktop, tablet and phone
+browsers) with patient, doctor and admin portals. The presentation
+tier is a Next.js~16 / React~18 application, and the application
+tier is a Node.js/Express REST API (\texttt{/v1}). The target
+deployment is Netlify for the frontend and Render for the backend,
+but both currently run locally on the development machine
+(localhost). The data tier is MongoDB Atlas accessed through the
+Mongoose ODM. The tiers communicate over HTTPS, REST with a Clerk
+JWT, and Mongoose respectively. Clerk and the Google Gemini API are
+consumed as external services. Payment (Stripe) and video (LiveKit)
+services shown in the architecture figure are not part of the
+current implementation and will be integrated in the future.
+
+\widefig{architecture.png}{System architecture: three-tier web
+  architecture with external SaaS services}{fig:architecture}
+
+\subsection{Technical Stack}
+
+\begin{itemize}
+  \item \textbf{Framework/Language:} Next.js and React with
+    Tailwind and shadcn/ui on the frontend~\cite{nextjs}; Node.js
+    and Express on the backend~\cite{expressjs}.
+  \item \textbf{Database:} MongoDB Atlas with the Mongoose ODM and
+    Atlas Vector Search for patient-scoped embeddings~\cite{mongodbatlas}.
+  \item \textbf{Tools:} GitHub Actions for CI (build, lint and
+    tests); Render (backend) and Netlify (frontend) for staging
+    deployment, which is planned (the application currently runs on
+    localhost).
+  \item \textbf{Libraries and services:} Clerk for authentication
+    and JWT sessions~\cite{clerk}; Google Gemini (via the Vercel AI
+    SDK) for the AI assistant~\cite{gemini}.
+  \item \textbf{Planned for the future:} Stripe for online payments
+    and LiveKit for video consultation.
+\end{itemize}
+
+\subsection{AI Assistant Scope}
+
+The AI pre-consultation assistant is an integration task, not a
+research contribution:
+
+\begin{itemize}
+  \item An existing LLM API (Gemini) is used for conversational
+    symptom intake; there is no in-house model training.
+  \item A lightweight safety/triage layer detects emergency-flagged
+    symptoms (for example chest pain, stroke signs, self-harm) and
+    always routes to a ``seek immediate care'' response rather than
+    open-ended advice.
+  \item The assistant only prepares context for the doctor; it
+    never issues a diagnosis or prescription.
+\end{itemize}
+
+\subsection{Scalability and Deployability}
+
+\begin{itemize}
+  \item \textbf{Theoretical scalability:} The frontend and backend
+    are decoupled; REST endpoints are stateless; appointment and
+    user queries are indexed in MongoDB.
+  \item \textbf{Practical deployability:} The system is designed to
+    run on common managed hosting: MongoDB Atlas as the database,
+    Render and Netlify as deployment targets, and GitHub Actions for
+    the staging/production pipeline. Deployment is still to be done;
+    at present everything runs locally.
+\end{itemize}
+
+\section{UML Modelling}
+
+The diagrams in this section describe the target design of the
+platform. Elements for online payments (Stripe) and video
+conferencing (LiveKit) that appear in them will be implemented in
+the future.
+
+\subsection{Use Case Model}
+
+The use case model (Figure~\ref{fig:usecase}) identifies the
+Patient, Doctor and Admin as human actors, and Clerk, Gemini and a
+cron scheduler as external systems in the current scope. The Stripe
+and LiveKit actors shown in the diagram stand for online payments
+and video conferencing, which will be implemented in the future.
+
+\widefig{usecase.png}{Use case diagram of the ArogyaMitra
+  platform}{fig:usecase}
+
+\subsection{Class Diagrams}
+
+The class diagrams are derived from the Mongoose models of the
+backend. Figure~\ref{fig:class-domain} shows the domain model (User
+and its Patient, Doctor and Admin specialisations, Consultation and
+Payment, and their enumerations). Figure~\ref{fig:class-ai} shows the
+AI assistant and medical-records classes (AiConversation, AiUsage,
+MedicalEmbedding and the RAG path).
+
+\widefig{class_domain.png}{Class diagram: domain model}{fig:class-domain}
+
+\widefig{class_ai.png}{Class diagram: AI assistant and medical records
+  (AiConversation, AiUsage, MedicalEmbedding, RAG
+  path)}{fig:class-ai}
+
+\subsection{Activity Diagram}
+
+Figure~\ref{fig:activity} shows the end-to-end workflow, from
+sign-in to a completed consultation.
+
+\widefig{activity.png}{Activity diagram: end-to-end workflow from
+  sign-in to completed consultation}{fig:activity}
+
+\subsection{Swimlane Diagram}
+
+Figure~\ref{fig:swimlane} shows who does what across the Patient,
+Platform, External services and Doctor lanes.
+
+\widefig{swimlane.png}{Swimlane diagram: Patient, Platform, External
+  services and Doctor}{fig:swimlane}
+
+\subsection{State Diagrams}
+
+Figure~\ref{fig:states} shows the Consultation, Payment and
+Doctor-approval lifecycles. A consultation is created as
+\emph{pending}, becomes \emph{in-progress} when a participant joins
+within the booked hour, and ends as \emph{completed} or
+\emph{canceled}; a cron job runs at minute~0 of every hour to close
+past consultations.
+
+\widefig{states.png}{State diagrams: Consultation, Payment and
+  Doctor-approval lifecycles}{fig:states}
+
+\subsection{Sequence Diagrams}
+
+One sequence diagram describes the key AI interaction: the
+pre-consultation flow of quota check, Gemini tool calls,
+triage/RAG and persistence (Figure~\ref{fig:seq-ai}).
+
+\widefig{seq_ai.png}{Sequence diagram: AI pre-consultation assistant
+  (quota, Gemini tool calls, triage/RAG, persistence)}{fig:seq-ai}
+
+\section{Data Flow Diagrams}
+
+The data flow diagrams use the following notation: a circle is a
+process, a rectangle is an external entity, and an open box is a
+data store. Figure~\ref{fig:dfd0} gives the Level~0 context
+diagram, Figure~\ref{fig:dfd1} the Level~1 decomposition, and
+Figures~\ref{fig:dfd2-1}--\ref{fig:dfd2-6} the Level~2 diagrams of
+processes 1.0 to 6.0.
+
+\widefig{dfd0.png}{DFD Level 0: context diagram}{fig:dfd0}
+
+\widefig{dfd1.png}{DFD Level 1}{fig:dfd1}
+
+\squarefig{dfd2_1.png}{DFD Level 2: process 1.0, Authentication and
+  user sync}{fig:dfd2-1}
+
+\squarefig{dfd2_2.png}{DFD Level 2: process 2.0, Doctor profile and
+  approval}{fig:dfd2-2}
+
+\squarefig{dfd2_3.png}{DFD Level 2: process 3.0, Booking and
+  payment}{fig:dfd2-3}
+
+\squarefig{dfd2_4.png}{DFD Level 2: process 4.0, Consultation
+  session}{fig:dfd2-4}
+
+\squarefig{dfd2_5.png}{DFD Level 2: process 5.0, AI pre-consultation
+  assistant}{fig:dfd2-5}
+
+\squarefig{dfd2_6.png}{DFD Level 2: process 6.0, Medical records and
+  embeddings}{fig:dfd2-6}
+
+\section{SDLC Model Selection}
+
+Waterfall, Prototyping and Agile Scrum were evaluated
+(Table~\ref{tab:sdlc}); Agile Scrum was selected.
+
+\begin{table}[!htbp]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.85in}YYY@{}}
+  \toprule
+  \textbf{Metric} & \textbf{Waterfall} & \textbf{Prototyping} &
+  \textbf{Agile Scrum (selected)} \\
+  \midrule
+  Requirement adaptability &
+    Rigid; changes are expensive once a phase concludes &
+    Flexible for UI; weak for architectural evolution &
+    High; requirements refined iteratively every sprint \\
+  Feedback frequency &
+    Late; user evaluation only at final acceptance &
+    Early UI feedback; variable back-end validation &
+    Continuous; pilot users and supervisor review after each
+    sprint \\
+  Risk and bug mitigation &
+    Found late, during integrated testing &
+    Medium; addressed during prototype refinement &
+    Immediate; CI (build + lint + tests) on every change, AI
+    safety regression suite \\
+  Delivery milestones &
+    Single monolithic release at the end date &
+    Demo prototype followed by a full build &
+    Incremental; usable MVP first (auth + booking + chat), then
+    AI and admin \\
+  \bottomrule
+\end{tabularx}
+\caption{Evaluation of SDLC models}
+\label{tab:sdlc}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{How Scrum is applied:} Weekly iterations, each
+    ending with a working increment. CI runs on GitHub Actions;
+    staging on Render and Netlify is planned, since the
+    application currently runs on localhost.
+  \item \textbf{Release plan:} Sprint~1 delivers auth, profiles,
+    booking, chat and TTC logging. Next come the AI assistant with
+    safety tests, admin and deployment. Online payments and video
+    consultation are planned for the future.
+  \item \textbf{Why not the others:} Waterfall: AI and real-time
+    behaviour need early feedback. Prototyping: weak for back-end
+    integrity.
+\end{itemize}
+
+Agile Scrum supports iterative refinement, continuous feedback,
+early delivery and rapid risk mitigation.
+
+% ===== CHAPTER 3: RESULTS & EVALUATION =====
+
+\chapter{Results and Evaluation}
+
+\section{Testing Methodology}
+
+The frontend and backend currently run on the local development
+machine (localhost) and have not yet been deployed to Netlify and
+Render. This chapter first records the current implementation
+status and then defines the evaluation plan against which the
+implementation will be measured.
+
+\subsection{Current Implementation Status}
+
+\begin{itemize}
+  \item \textbf{Environment:} Frontend and backend run locally on
+    the development PC (localhost). Deployment to Netlify and Render
+    is planned.
+  \item \textbf{Payments and video:} The Stripe payment gateway and
+    video conferencing are not implemented yet and will be
+    implemented in the future.
+\end{itemize}
+
+\subsection{Testing Plan}
+
+\begin{itemize}
+  \item \textbf{Unit Testing:} Backend unit tests run in CI
+    together with the build and lint steps on every change.
+  \item \textbf{Integration Testing:} Currently performed on
+    localhost. Once deployed, repeatable deployments to the staging
+    environment (Render and Netlify) via the CI/CD pipeline will
+    exercise login, booking and consultation end to end.
+  \item \textbf{Performance Testing:} Time-to-connect is measured
+    from server-side timestamps (scheduled time versus
+    session-join event).
+  \item \textbf{User Testing:} A pilot with 10--15 patients and
+    3--5 volunteer or simulated doctor accounts, comparing TTC and
+    booking completion rate across iterations.
+  \item \textbf{AI Safety Testing:} A fixed regression suite of
+    symptom prompts, including emergency cases, is run before each
+    release to catch safety regressions.
+\end{itemize}
+
+\section{Performance Metrics}
+
+Table~\ref{tab:performance} lists the metrics and targets used to evaluate ArogyaMitra.
+
+\begin{table}[H]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{1.3in}>{\raggedright\arraybackslash}p{1.45in}Y@{}}
+  \toprule
+  \textbf{Metric} & \textbf{Target} & \textbf{How it is measured} \\
+  \midrule
+  Time-to-connect (primary) & Median $\leq$ 2 minutes &
+    Server-side timestamps: scheduled start versus both parties
+    in the same session \\
+  Booking completion rate & Compared across iterations &
+    Share of started bookings that result in a confirmed
+    appointment \\
+  AI assistant safety accuracy & Fixed suite must pass before every release &
+    Share of emergency-flagged test cases routed to ``seek
+    immediate care'' \\
+  User clarity & Simple 1--5 rating &
+    Patient-reported clarity of the consultation flow \\
+  Reliability & e.g., $\geq$ 99\% availability &
+    Availability of login, booking and consultation on
+    staging/production during test windows \\
+  \bottomrule
+\end{tabularx}
+\caption{Evaluation metrics and targets (to be measured during the pilot)}
+\label{tab:performance}
+\end{table}
+
+\section{Analysis}
+
+\begin{itemize}
+  \item \textbf{Objectives:} Feasibility has been validated, the
+    requirements are documented, and the UML and DFD models are
+    complete. Online payments (Stripe), video conferencing and the
+    Netlify/Render deployment are not yet implemented and will be
+    done in the future; measured results will follow once they are
+    done.
+  \item \textbf{Challenges and mitigations:}
+  \begin{itemize}
+    \item \emph{Data privacy and consent:} collect only the
+      medical data required for the consultation record, and do
+      not persist raw AI conversations beyond what is needed for
+      the doctor's context.
+    \item \emph{AI safety failure:} a fixed emergency-prompt
+      regression suite must pass before every release; the
+      assistant never diagnoses or prescribes.
+    \item \emph{Real-time reliability:} connection-state handling
+      and reconnect logic so that a dropped session does not lose
+      consultation context.
+    \item \emph{Doctor adoption:} keep the doctor dashboard minimal
+      to reduce onboarding friction during the pilot.
+    \item \emph{Operational issues in the pilot:} deploy to staging
+      early (the application currently runs only on localhost) and
+      ensure CI/CD produces repeatable deployments before the
+      pilot window.
+
+  \end{itemize}
+\end{itemize}
+
+% ===== CHAPTER 4: CONCLUSION =====
+
+\chapter{Conclusion}
+
+\section{Summary of Work}
+
+This project proposes a deployable, AI-assisted real-time
+telemedicine platform that reduces the friction between patients
+and doctors for non-emergency consultations. It emphasises
+time-to-value through rapid iterations on a proven codebase, CI/CD
+for frequent safe releases, and measurable evaluation criteria
+(time-to-connect and AI assistant safety accuracy), staying focused
+on engineering integration and safe AI-assistance boundaries rather
+than research-driven novelty. At present the frontend and backend
+run locally on the development machine. Online payments (Stripe),
+video conferencing and the deployment to Netlify and Render are not
+part of the current implementation and will be implemented in the
+future.
+
+\section{Key Findings}
+
+\begin{itemize}
+  \item \textbf{Feasibility validated:} The platform is highly
+    viable on a standard managed stack with minimal infrastructure
+    demands.
+  \item \textbf{SRS documented:} Eight functional and five
+    non-functional requirements were specified.
+  \item \textbf{UML and DFD modelled:} UML diagrams and DFD
+    Levels~0--2 were produced.
+  \item \textbf{Agile Scrum selected:} It best supports iterative
+    refinement, continuous feedback, early delivery and rapid risk
+    mitigation.
+\end{itemize}
+
+\section{Future Work and Recommendations}
+
+\begin{enumerate}
+  \item Implement online payments with the Stripe payment gateway
+    (checkout, webhook and idempotent fulfilment) in a future
+    iteration.
+  \item Implement real-time video consultation (LiveKit) alongside
+    the existing chat in a future iteration.
+  \item Deploy the frontend to Netlify and the backend to Render,
+    with CI/CD to staging, replacing the current localhost setup.
+  \item Add the AI pre-consultation assistant with its
+    emergency-triage regression suite and the admin/analytics view,
+    then run the pilot and compare TTC and booking completion rate
+    across iterations.
+\end{enumerate}
+
+\section{Final Remarks}
+
+The specification, models and process selected in this report give
+the team a clear and validated basis for building ArogyaMitra
+incrementally, with safety boundaries for the AI assistant defined
+from the start.
+
+% ===== BIBLIOGRAPHY =====
+
+% Print bibliography with heading in TOC
+\printbibliography[heading=bibintoc]
+
+\end{document}
